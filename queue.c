@@ -280,7 +280,8 @@ void q_sort(struct list_head *head, bool descend)
     if (!head || list_empty(head) || list_is_singular(head))
         return;
 
-    const struct list_head *slow = head, *fast = NULL;
+    struct list_head *slow = head;
+    const struct list_head *fast = NULL;
 
     for (fast = head->next; fast != head && fast->next != head;
          fast = fast->next->next)
