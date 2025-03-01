@@ -206,7 +206,6 @@ void q_swap(struct list_head *head)
 }
 
 /* Reverse elements in queue */
-/* Reverse elements in queue */
 void q_reverse(struct list_head *head)
 {
     if (!head || list_empty(head)) {
@@ -255,18 +254,58 @@ void q_sort(struct list_head *head, bool descend) {}
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
+
 int q_ascend(struct list_head *head)
 {
+    if (!head || list_empty(head)) {
+        return 0;
+    }
+
+    struct list_head *current = head->next;
+    const element_t *max_entry = list_entry(current, element_t, list);
+
+    struct list_head *safe;
+    for (current = current->next, safe = current->next; current != head;
+         current = safe, safe = current->next) {
+        element_t *current_entry = list_entry(current, element_t, list);
+        if (strcmp(current_entry->value, max_entry->value) < 0) {
+            list_del(current);
+            free(current_entry->value);
+            free(current_entry);
+        } else {
+            max_entry = current_entry;
+        }
+    }
+
+    return q_size(head);
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
-    return 0;
 }
 
 /* Remove every node which has a node with a strictly greater value anywhere to
  * the right side of it */
 int q_descend(struct list_head *head)
 {
+    if (!head || list_empty(head)) {
+        return 0;
+    }
+
+    struct list_head *current = head->next;
+    const element_t *min_entry = list_entry(current, element_t, list);
+
+    struct list_head *safe;
+    for (current = current->next, safe = current->next; current != head;
+         current = safe, safe = current->next) {
+        element_t *current_entry = list_entry(current, element_t, list);
+        if (strcmp(current_entry->value, min_entry->value) > 0) {
+            list_del(current);
+            free(current_entry->value);
+            free(current_entry);
+        } else {
+            min_entry = current_entry;
+        }
+    }
+    return q_size(head);
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
-    return 0;
 }
 
 /* Merge all the queues into one sorted queue, which is in ascending/descending
