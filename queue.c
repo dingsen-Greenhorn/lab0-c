@@ -250,7 +250,47 @@ void q_reverseK(struct list_head *head, int k)
     list_splice_init(&new_head, head);
 }
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+
+bool cmp(const char *s1, const char *s2)
+{
+    return strcmp(s1, s2) > 0 ? true : false;
+}
+
+void mergeTwoLists(struct list_head *L1, struct list_head *L2, bool descend)
+{
+    if (!L1 || !L2)
+        return;
+    struct list_head head;
+    INIT_LIST_HEAD(&head);
+    while (!list_empty(L1) && !list_empty(L2)) {
+        element_t *e1 = list_first_entry(L1, element_t, list);
+        element_t *e2 = list_first_entry(L2, element_t, list);
+        struct list_head *node = (descend ^ (strcmp(e1->value, e2->value) < 0))
+                                     ? L1->next
+                                     : L2->next;
+        list_move_tail(node, &head);
+    }
+    list_splice_tail_init(list_empty(L1) ? L2 : L1, &head);
+    list_splice(&head, L1);
+}
+/* Sort elements of queue in ascending/descending order */
+void q_sort(struct list_head *head, bool descend)
+{
+    // https://hackmd.io/IKsnn85aRHGMrNcRP7BJ1Q?view#2024q1-Homework1-lab0
+    if (!head || list_empty(head) || list_is_singular(head))
+        return;
+
+    const struct list_head *slow = head, *fast = NULL;
+
+    for (fast = head->next; fast != head && fast->next != head;
+         fast = fast->next->next)
+        slow = slow->next;
+    struct list_head left;
+    list_cut_position(&left, head, slow);
+    q_sort(&left, descend);
+    q_sort(head, descend);
+    mergeTwoLists(head, &left, descend);
+}
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
