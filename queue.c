@@ -87,69 +87,6 @@ bool q_insert_tail(struct list_head *head, char *s)
     list_add_tail(&new_content->list, head);
     return true;
 }
-// bool q_insert_head(struct list_head *head, char *s)
-// {
-//     if (!head || !s) {
-//         return false;
-//     }
-
-//     element_t *new_content = malloc(sizeof(element_t));
-
-//     if (!new_content) {
-//         return false;
-//     }
-
-//     INIT_LIST_HEAD(&new_content->list);
-//     new_content->value = strdup(s);
-
-//     if (!new_content->value) {
-//         free(new_content);
-//         return false;
-//     }
-
-//     list_add(&new_content->list, head);
-//     return true;
-// }
-
-// /* Insert an element at tail of queue */
-// bool q_insert_tail(struct list_head *head, char *s)
-// {
-//     if (!head || !s) {
-//         return false;
-//     }
-
-//     element_t *new_content = malloc(sizeof(element_t));
-
-//     if (!new_content) {
-//         return false;
-//     }
-//     INIT_LIST_HEAD(&new_content->list);
-//     new_content->value = strdup(s);
-
-//     if (!new_content->value) {
-//         free(new_content);
-//         return false;
-//     }
-
-//     list_add_tail(&new_content->list, head);
-//     return true;
-// }
-
-/* Remove an element at head of queue */
-// element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
-// {
-//     if (!head || list_empty(head)) {
-//         return NULL;
-//     }
-//     element_t *first = list_first_entry(head, element_t, list);
-//     list_del(&first->list);
-
-//     if (sp && bufsize > 0) {
-//         strncpy(sp, first->value, bufsize - 1);
-//         sp[bufsize - 1] = '\0';
-//     }
-
-//     return first;
 
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
@@ -263,6 +200,16 @@ void q_swap(struct list_head *head)
     // https://leetcode.com/problems/swap-nodes-in-pairs/
     q_reverseK(head, 2);
 }
+// static inline void swap(struct list_head *node_1, struct list_head *node_2)
+// {
+//     if (node_1 == node_2)
+//         return;
+//     struct list_head *node_1_prev = node_1->prev;
+//     struct list_head *node_2_prev = node_2->prev;
+//     if (node_1->prev != node_2)
+//         list_move(node_2, node_1_prev);
+//     list_move(node_1, node_2_prev);
+// }
 
 /* Reverse elements in queue */
 void q_reverse(struct list_head *head)
@@ -426,7 +373,6 @@ int q_merge(struct list_head *head, bool descend)
     if (head->next == head->prev)
         return first_queue->size;
 
-    // Iterate from the second node to the end
     struct list_head *pos = head->next->next;
     struct list_head *n;
 
@@ -452,4 +398,23 @@ int q_merge(struct list_head *head, bool descend)
     first_queue->size = q_size(first_queue->q);
 
     return first_queue->size;
+}
+
+void q_shuffle(struct list_head *head)
+{
+    if (!head || list_is_singular(head))
+        return;
+    struct list_head *last = head;
+    int size = q_size(head);
+    while (size > 0) {
+        int index = rand() % size;
+        struct list_head *new = last->prev;
+        struct list_head *old = new;
+        while (index--)
+            old = old->prev;
+        swap(new, old);
+        last = last->prev;
+        size--;
+    }
+    return;
 }

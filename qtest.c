@@ -22,7 +22,6 @@
 #include "dudect/fixture.h"
 #include "list.h"
 #include "random.h"
-
 /* Shannon entropy */
 extern double shannon_entropy(const uint8_t *input_data);
 extern int show_entropy;
@@ -84,6 +83,7 @@ typedef enum {
     POS_HEAD,
 } position_t;
 /* Forward declarations */
+
 static bool q_show(int vlevel);
 
 static bool do_free(int argc, char *argv[])
@@ -1055,10 +1055,23 @@ static bool do_next(int argc, char *argv[])
 
     return q_show(0);
 }
-
+static bool do_shuffle(int argc, char *argv[])
+{
+    if (!current || !current->q)
+        report(3, "Warning: Calling shuffle on null queue");
+    error_check();
+    if (q_size(current->q) < 2)
+        report(3, "Warning: Calling shuffle on single queue");
+    error_check();
+    if (exception_setup(true))
+        q_shuffle(current->q);
+    q_show(3);
+    return !error_check();
+}
 static void console_init()
 {
     ADD_COMMAND(new, "Create new queue", "");
+    ADD_COMMAND(shuffle, "Do Fisher-Yates shuffle", "");
     ADD_COMMAND(free, "Delete queue", "");
     ADD_COMMAND(prev, "Switch to previous queue", "");
     ADD_COMMAND(next, "Switch to next queue", "");
